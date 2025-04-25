@@ -12,6 +12,12 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
+const (
+	MAXSIZE    = 1024
+	MAXBACKUPS = 7
+	MAXAGE     = 30
+)
+
 // ContextLogger 定义一个封装类型
 type ContextLogger struct {
 	base zerolog.Logger
@@ -61,10 +67,11 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 }
 
 func Init(serviceName string, config Config) *ContextLogger {
-	var maxSize = 1024
-	var maxBackups = 7
-	var maxAge = 30
-
+	var (
+		maxSize    = MAXSIZE
+		maxBackups = MAXBACKUPS
+		maxAge     = MAXAGE
+	)
 	if config.MaxSize > 0 {
 		maxSize = config.MaxSize
 	}
