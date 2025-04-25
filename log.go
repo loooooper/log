@@ -38,6 +38,13 @@ func (l *ContextLogger) Error(ctx context.Context, err error, msg string) {
 	}
 }
 
+type Config struct {
+	MaxSize    int
+	MaxBackups int
+	MaxAge     int
+	Compress   bool
+}
+
 type ctxKeyLogger struct{}
 
 func LoggerMiddleware(next http.Handler) http.Handler {
@@ -53,7 +60,23 @@ func LoggerMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func Init(serviceName string, maxSize int, maxBackups int, maxAge int) *ContextLogger {
+func Init(serviceName string, config Config) *ContextLogger {
+	var maxSize = 1024
+	var maxBackups = 7
+	var maxAge = 30
+
+	if config.MaxSize > 0 {
+		maxSize = config.MaxSize
+	}
+
+	if config.MaxBackups > 0 {
+		maxBackups = config.MaxBackups
+	}
+
+	if config.MaxAge > 0 {
+		maxAge = config.MaxAge
+	}
+
 	rotator := &lumberjack.Logger{
 		Filename:   serviceName + ".log",
 		MaxSize:    maxSize, // MB
